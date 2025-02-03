@@ -102,21 +102,21 @@ export const token_withdraw = async (
     const tokenVaultAta = getAssociatedTokenAddressSync(
         MINT_ADDRESS,
         TOKEN_VAULT_ADDRESS,
-        false,
+        true,
         programStandard
     );
 
-    console.log("token ata =>", tokenVaultAta.toBase58())
-    const tokenVaultAtaInstruction =
-    createAssociatedTokenAccountIdempotentInstruction(
-        TOKEN_VAULT_ADDRESS,
-        tokenVaultAta,
-        TOKEN_VAULT_ADDRESS,
-        MINT_ADDRESS,
-        programStandard
-    );
+    // console.log("token ata =>", tokenVaultAta.toBase58())
+    // const tokenVaultAtaInstruction =
+    // createAssociatedTokenAccountIdempotentInstruction(
+    //     TOKEN_VAULT_ADDRESS,
+    //     tokenVaultAta,
+    //     TOKEN_VAULT_ADDRESS,
+    //     MINT_ADDRESS,
+    //     programStandard
+    // );
     
-    transaction.add(tokenVaultAtaInstruction);
+    // transaction.add(tokenVaultAtaInstruction);
     
     const userAta = getAssociatedTokenAddressSync(
         MINT_ADDRESS,
@@ -126,16 +126,16 @@ export const token_withdraw = async (
     );
     console.log("user ata =>", userAta.toBase58())
 
-    const userAtaInstruction =
-        createAssociatedTokenAccountIdempotentInstruction(
-            USER_ADDRESS,
-            userAta,
-            USER_ADDRESS,
-            MINT_ADDRESS,
-            programStandard
-        );
+    // const userAtaInstruction =
+    //     createAssociatedTokenAccountIdempotentInstruction(
+    //         USER_ADDRESS,
+    //         userAta,
+    //         USER_ADDRESS,
+    //         MINT_ADDRESS,
+    //         programStandard
+    //     );
 
-    transaction.add(userAtaInstruction);
+    // transaction.add(userAtaInstruction);
 
     const mint = await provider.connection.getTokenSupply(MINT_ADDRESS);
     const decimals = mint.value.decimals;
@@ -150,8 +150,7 @@ export const token_withdraw = async (
             .accounts({
                 mintToken: MINT_ADDRESS,
                 userToken: userAta,
-                tokenVault: tokenVaultAta,
-                signer:program.provider.publicKey,
+                tokenVaultAta: tokenVaultAta
             })
             .instruction()
     );

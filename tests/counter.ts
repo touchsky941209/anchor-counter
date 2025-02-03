@@ -17,8 +17,8 @@ describe("counter", () => {
     adminProvider.opts
   )
 
-  // anchor.setProvider(user1Provider)
-  anchor.setProvider(adminProvider)
+  anchor.setProvider(user1Provider)
+  // anchor.setProvider(adminProvider)
 
 
   const program = anchor.workspace.Counter as Program<Counter>;
@@ -39,30 +39,29 @@ describe("counter", () => {
     await adminProvider.connection.confirmTransaction(sign2)
   })
 
-  it("Is initialized!", async () => {
-    try {
-      const txSig = await program.methods
-        .initialize()
-        .accounts({
-          counter: counterPDA,
-          tokenVault: tokenVaultPda
-        })
-        .rpc();
+  // it("Is initialized!", async () => {
+  //   try {
+  //     const txSig = await program.methods
+  //       .initialize()
+  //       .accounts({
+  //         counter: counterPDA,
+  //         tokenVault: tokenVaultPda
+  //       })
+  //       .rpc();
 
-      const accountData = await program.account.counter.fetch(counterPDA);
-      console.log("init success")
-      console.log(`Count: ${accountData.count}`);
-    } catch (error) {
-      // If PDA Account already created, then we expect an error
-      console.log("already init",error);
-    }
-  });
+  //     const accountData = await program.account.counter.fetch(counterPDA);
+  //     console.log("init success")
+  //     console.log(`Count: ${accountData.count}`);
+  //   } catch (error) {
+  //     // If PDA Account already created, then we expect an error
+  //     console.log("already init",error);
+  //   }
+  // });
 
   // it("fetch account", async () => {
   //   const accountData = await program.account.counter.fetch(counterPDA);
   //   console.log(`Count: ${accountData.count}`)
   // })
-
 
   // it("Increment with admin provider", async () => {
   //   const transactionSignature = await program.methods
@@ -78,45 +77,22 @@ describe("counter", () => {
   //   console.log(`Count: ${accountData.count}`);
   // });
 
-  it("Token transfer", async () => {
-    const amount = 100000
-    const provider = adminProvider
-    const programStandard = TOKEN_PROGRAM_ID;
-    const MINT_ADDRESS = mintToken.publicKey
-    const FROM_ADDRESS = provider.wallet.publicKey
-    const [tokenVaultPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("token_vault")],
-      program.programId,
-    );
-
-
-    const TO_ADDRESS = tokenVaultPda
-
-    console.log("pda =>", tokenVaultPda.toBase58())
-    const tx = await transfer(
-      provider,
-      program,
-      MINT_ADDRESS,
-      FROM_ADDRESS,
-      TO_ADDRESS,
-      amount,
-      programStandard
-    )
-  })
-
-  // it("Token withdraw", async () => {
-  //   const amount = 10
+  // it("Token transfer", async () => {
+  //   const amount = 100000
   //   const provider = adminProvider
   //   const programStandard = TOKEN_PROGRAM_ID;
   //   const MINT_ADDRESS = mintToken.publicKey
-  //   const FROM_ADDRESS = adminProvider.publicKey
-  //   const TO_ADDRESS = program.programId
+  //   const FROM_ADDRESS = provider.wallet.publicKey
+  //   const [tokenVaultPda] = PublicKey.findProgramAddressSync(
+  //     [Buffer.from("token_vault")],
+  //     program.programId,
+  //   );
 
 
+  //   const TO_ADDRESS = tokenVaultPda
 
-
-
-  //   const tx = await token_withdraw(
+  //   console.log("pda =>", tokenVaultPda.toBase58())
+  //   const tx = await transfer(
   //     provider,
   //     program,
   //     MINT_ADDRESS,
@@ -126,5 +102,29 @@ describe("counter", () => {
   //     programStandard
   //   )
   // })
+
+  it("Token withdraw", async () => {
+    const [tokenVaultPda] = PublicKey.findProgramAddressSync(
+      [Buffer.from("token_vault")],
+      program.programId,
+    );
+
+    const amount = 10
+    const provider = user1Provider
+    const programStandard = TOKEN_PROGRAM_ID;
+    const MINT_ADDRESS = mintToken.publicKey
+    const USER_ADDRESS = provider.publicKey
+    const TOKEN_VAULT_ADDRESS = tokenVaultPda
+
+    const tx = await token_withdraw(
+      provider,
+      program,
+      MINT_ADDRESS,
+      USER_ADDRESS,
+      TOKEN_VAULT_ADDRESS,
+      amount,
+      programStandard
+    )
+  })
 
 });

@@ -63,14 +63,13 @@ pub mod counter {
     }
     
     pub fn token_withdraw(ctx: Context<WithDrawToken>, amount: u64) -> Result<()> {
-        let counter = &ctx.accounts.counter;
-        let seeds = &[b"counter".as_ref(), &[counter.bump]];
+        let seeds = &[b"token_vault".as_ref(), &[ctx.bumps.token_vault]];
         let signer_seeds = &[&seeds[..]];
     
         let cpi_program = ctx.accounts.token_program.to_account_info();
         let cpi_account = token::Transfer {
-            authority: ctx.accounts.counter.to_account_info(),
-            from: ctx.accounts.token_vault.to_account_info(),
+            authority: ctx.accounts.token_vault.to_account_info(),
+            from: ctx.accounts.token_vault_ata.to_account_info(),
             to: ctx.accounts.user_token.to_account_info(),
         };
         let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_account, signer_seeds);
@@ -149,12 +148,15 @@ pub struct WithDrawToken<'info> {
     pub mint_token:Account<'info, token::Mint>,
     #[account(mut)]
     pub user_token: Account<'info, token::TokenAccount>,
+    ///CHECK:
     #[account(
         mut,
         seeds = [b"token_vault".as_ref()],
         bump
     )]
-    pub token_vault : Account<'info, token::TokenAccount>,
+    pub token_vault : AccountInfo<'info>,
+    #[account(mut)]
+    pub token_vault_ata : Account<'info, token::TokenAccount>,
     #[account(mut)]
     pub signer: Signer<'info>,
     #[account(
